@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bib HCV">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#312e81" />
+  <title>Chèche Bib la — HCV</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { display: ['Georgia', 'serif'] } } }
+    };
+  </script>
+  <style>
+    ::selection { background: #c7d2fe; color: #1e1b4b; }
+    .aurora { background: radial-gradient(circle at 14% 12%, rgba(129,140,248,.42), transparent 28%), radial-gradient(circle at 83% 2%, rgba(56,189,248,.24), transparent 27%), linear-gradient(135deg, #312e81 0%, #4338ca 49%, #0f766e 120%); }
+    .search-shadow:focus-within { box-shadow: 0 0 0 5px rgba(199,210,254,.72), 0 22px 42px rgba(30,41,59,.14); }
+    .verse-card { animation: rise .35s ease-out both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
+  <header class="aurora overflow-hidden text-white">
+    <div class="mx-auto max-w-5xl px-5 pb-12 pt-6 sm:px-8 sm:pb-16">
+      <nav class="flex items-center justify-between text-sm" aria-label="Navigasyon prensipal">
+        <div class="flex items-center gap-2 font-semibold tracking-wide">
+          <span class="grid h-9 w-9 place-items-center rounded-xl bg-white/15 text-lg ring-1 ring-white/20">✦</span>
+          <span data-i18n="brand">BIB LA <span class="font-normal text-indigo-200">HCV</span></span>
+        </div>
+        <div class="flex items-center gap-2"><span id="dataBadge" class="rounded-full bg-white/10 px-3 py-1.5 text-xs text-indigo-100 ring-1 ring-white/15">Ap prepare...</span><div class="flex rounded-lg bg-white/10 p-0.5 text-xs font-bold ring-1 ring-white/15"><button data-language="ht" class="language-button rounded-md px-2 py-1 text-white">KREYÒL</button><button data-language="en" class="language-button rounded-md px-2 py-1 text-indigo-200 hover:text-white">EN</button></div></div>
+      </nav>
+
+      <div class="mx-auto mt-14 max-w-3xl text-center sm:mt-16">
+        <p data-i18n="eyebrow" class="mb-3 text-xs font-bold uppercase tracking-[.24em] text-indigo-200">Pawòl ki bay lavi</p>
+        <h1 data-i18n="title" class="font-display text-4xl font-bold leading-tight sm:text-6xl">Chèche nan Bib la</h1>
+        <p data-i18n="subtitle" class="mx-auto mt-4 max-w-xl text-base leading-7 text-indigo-100 sm:text-lg">Jwenn yon vèsè, yon pasaj, oswa mo ki touche kè w — an kreyòl oswa an angle.</p>
+
+        <div class="search-shadow mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-2xl bg-white px-4 py-3 text-slate-900 shadow-xl transition sm:px-5">
+          <svg class="h-5 w-5 shrink-0 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
+          <label for="searchInput" class="sr-only">Chèche nan Bib la</label>
+          <input id="searchInput" type="search" autocomplete="off" disabled data-i18n-placeholder="searchPlaceholder" placeholder="Egzanp: Jan 3:16, Bondye renmen, oswa God loves" class="min-w-0 flex-1 bg-transparent py-1 text-base outline-none placeholder:text-slate-400 sm:text-lg" />
+          <kbd class="hidden rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-medium text-slate-400 sm:block">ESC</kbd>
+        </div>
+        <p id="statusText" class="mt-4 text-sm text-indigo-100" aria-live="polite">Chajman done yo ap fèt...</p>
+        <div id="englishBiblePicker" class="mt-3 hidden text-xs font-semibold text-white">
+          <label class="cursor-pointer underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">Chwazi fichye KJV a <input id="englishFileInput" type="file" accept="application/json,.json" class="sr-only" /></label>
+          <span class="mx-1.5 text-indigo-300">oswa</span>
+          <a href="kjv-1769.json" download="kjv-1769.json" class="underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">telechaje li</a>
+        </div>
+        <div id="commentaryPicker" class="mt-2 hidden text-xs font-semibold text-white"><label class="cursor-pointer underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">Chwazi kòmantè a <input id="commentaryFileInput" type="file" accept="application/json,.json" class="sr-only" /></label><span class="mx-1.5 text-indigo-300">oswa</span><a href="mhc-commentary.json" download="mhc-commentary.json" class="underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">telechaje li</a></div>
+        <p data-i18n="searchHint" class="mt-1 text-xs text-indigo-200">Ou ka ekri yon fraz, yon ekspresyon, oswa yon emosyon.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-5xl px-5 pb-16 sm:px-8">
+    <section class="mx-auto -mt-7 max-w-3xl rounded-2xl border border-indigo-100 bg-white p-5 shadow-lg shadow-indigo-950/5 sm:p-6">
+      <div class="flex gap-3">
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 text-lg">✦</div>
+        <div><h2 data-i18n="questionTitle" class="font-bold text-slate-800">Poze yon kesyon sou Bib la</h2><p data-i18n="questionExample" class="mt-0.5 text-sm text-slate-500">Egzanp: <em>What does the Bible say about love?</em></p></div>
+      </div>
+      <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+        <label for="questionInput" class="sr-only">Kesyon sou Bib la</label>
+        <input id="questionInput" type="text" autocomplete="off" data-i18n-placeholder="questionPlaceholder" placeholder="Ekri kesyon ou an angle oswa an kreyòl..." class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100" />
+        <button id="askButton" data-i18n="askButton" class="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200">Jwenn vèsè yo</button>
+      </div>
+      <p id="questionHelp" class="mt-3 hidden text-sm text-amber-700" aria-live="polite"></p>
+    </section>
+
+    <section id="uploadPanel" class="mx-auto -mt-7 hidden max-w-2xl rounded-2xl border border-indigo-100 bg-white p-6 text-center shadow-lg shadow-indigo-950/5 sm:p-9">
+      <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-indigo-50 text-2xl">↑</div>
+      <h2 data-i18n="uploadTitle" class="mt-4 text-xl font-bold text-slate-800">Chwazi fichye Bib la</h2>
+      <p data-i18n="uploadText" class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Ajoute fichye <code class="rounded bg-slate-100 px-1.5 py-0.5 text-indigo-700">hcv.json</code> a pou kòmanse rechèch ou.</p>
+      <label for="fileInput" class="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus-within:ring-4 focus-within:ring-indigo-200">
+        <span data-i18n="chooseFile">Chwazi fichye a</span>
+        <input id="fileInput" type="file" accept="application/json,.json" class="sr-only" />
+      </label>
+    </section>
+
+    <section id="welcomePanel" class="mx-auto max-w-3xl py-12 text-center sm:py-16">
+      <div class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-white text-3xl shadow-sm ring-1 ring-slate-100">⌕</div>
+      <h2 data-i18n="welcomeTitle" class="mt-6 text-2xl font-bold tracking-tight text-slate-800">Kisa w ap chèche jodi a?</h2>
+      <p data-i18n="welcomeText" class="mt-2 text-slate-500">Ekri yon referans oswa kèk mo an kreyòl oswa an angle.</p>
+      <div class="mt-7 flex flex-wrap justify-center gap-2" aria-label="Egzanp rechèch">
+        <button class="example rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">Jan 3:16</button>
+        <button class="example rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">Som 23</button>
+        <button class="example rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">Bondye renmen</button>
+        <button class="example rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">God is love</button>
+        <button class="example rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">I am sad</button>
+      </div>
+    </section>
+
+    <section id="resultsPanel" class="hidden pt-9" aria-live="polite">
+      <div class="mb-5 flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+        <div><p data-i18n="resultsHeading" class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600">Rezilta rechèch</p><h2 id="resultsCount" class="mt-1 text-xl font-bold text-slate-800"></h2></div>
+        <button id="clearButton" data-i18n="clear" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-800">Efase</button>
+      </div>
+      <div id="versesDisplay" class="space-y-4"></div>
+    </section>
+  </main>
+
+  <footer data-i18n="footer" class="border-t border-slate-200 bg-white px-5 py-6 text-center text-sm text-slate-400">Rechèch nan Bib la • Haitian Creole Version</footer>
+
+  <script>
+    let bibleData = [], englishBibleData = [], commentaryData = null, uniqueBooks = [], hasSearchListener = false, activeQuestionTopic = null;
+    const $ = (id) => document.getElementById(id);
+    let language = 'ht';
+    const translations = {
+      ht: { brand: 'BIB LA HCV', eyebrow: 'Pawòl ki bay lavi', title: 'Chèche nan Bib la', subtitle: 'Jwenn yon vèsè, yon pasaj, oswa mo ki touche kè w — an kreyòl oswa an angle.', searchPlaceholder: 'Egzanp: Jan 3:16, Bondye renmen, oswa God loves', searchHint: 'Ou ka ekri yon fraz, yon ekspresyon, oswa yon emosyon.', questionTitle: 'Poze yon kesyon sou Bib la', questionExample: 'Egzanp: What does the Bible say about love?', questionPlaceholder: 'Ekri kesyon ou an angle oswa an kreyòl...', askButton: 'Jwenn vèsè yo', uploadTitle: 'Chwazi fichye Bib la', uploadText: 'Ajoute fichye hcv.json a pou kòmanse rechèch ou.', chooseFile: 'Chwazi fichye a', welcomeTitle: 'Kisa w ap chèche jodi a?', welcomeText: 'Ekri yon referans oswa kèk mo an kreyòl oswa an angle.', resultsHeading: 'Rezilta rechèch', clear: 'Efase', footer: 'Rechèch nan Bib la • Haitian Creole Version', loading: 'Chajman done yo ap fèt...', ready: 'Bib la pare pou rechèch.', chooseBible: 'Chwazi fichye Bib la pou kòmanse.', chooseKjv: 'Chwazi fichye KJV a', or: 'oswa', download: 'telechaje li', questionHelp: 'Eseye mete yon mo kle, tankou “batèm”, “syèl”, oswa “Jezi”.', found: '{count} vèsè jwenn', noResults: 'Pa jwenn rezilta pou “{query}”', noTopic: 'Pa jwenn vèsè sou {topic}', about: ' · sou {topic}', english: ' · anglè → kreyòl', phraseFirst: ' · fraz egzak an premye', emotion: ' · emosyon: {emotion}', showing: ' · {count} ap parèt', hcvLoaded: '{count} vèsè HCV chaje', kjvLoaded: '{hcv} HCV + {kjv} KJV', topic_lanmou: 'lanmou', topic_lafwa: 'lafwa', topic_lapriyè: 'lapriyè', topic_padon: 'padon', topic_espwa: 'espwa', topic_laperèz: 'laperèz', topic_delivrans: 'delivrans', topic_lapè: 'lapè', topic_fanmi: 'fanmi', topic_syèl: 'syèl', explanation: 'Eksplikasyon senp', contextNote: 'Sa se yon ti gid; li pasaj ki bò kote vèsè a pou tout kontèks la.', genericExplanation: 'Vèsè sa a envite nou reflechi sou mesaj Bondye a epi aplike li avèk sajès nan lavi nou.' },
+      en: { brand: 'BIBLE HCV', eyebrow: 'Words that give life', title: 'Search the Bible', subtitle: 'Find a verse, passage, or words that speak to your heart — in Creole or English.', searchPlaceholder: 'Example: John 3:16, Bondye renmen, or God loves', searchHint: 'You can type a sentence, phrase, or emotion.', questionTitle: 'Ask a Bible question', questionExample: 'Example: What does the Bible say about love?', questionPlaceholder: 'Ask in English or Creole...', askButton: 'Find verses', uploadTitle: 'Choose your Bible file', uploadText: 'Add hcv.json to start searching.', chooseFile: 'Choose file', welcomeTitle: 'What are you looking for today?', welcomeText: 'Type a reference or a few words in Creole or English.', resultsHeading: 'Search results', clear: 'Clear', footer: 'Bible search • Haitian Creole Version', loading: 'Loading Bible data...', ready: 'Your Bible is ready to search.', chooseBible: 'Choose your Bible file to begin.', chooseKjv: 'Choose the KJV file', or: 'or', download: 'download it', questionHelp: 'Try including a key word, such as “baptism”, “heaven”, or “Jesus”.', found: '{count} verses found', noResults: 'No results for “{query}”', noTopic: 'No verses found about {topic}', about: ' · about {topic}', english: ' · English → Creole', phraseFirst: ' · exact phrase first', emotion: ' · emotion: {emotion}', showing: ' · showing {count}', hcvLoaded: '{count} HCV verses loaded', kjvLoaded: '{hcv} HCV + {kjv} KJV', topic_lanmou: 'love', topic_lafwa: 'faith', topic_lapriyè: 'prayer', topic_padon: 'forgiveness', topic_espwa: 'hope', topic_laperèz: 'fear', topic_delivrans: 'salvation', topic_lapè: 'peace', topic_fanmi: 'family', topic_syèl: 'heaven', explanation: 'Plain-language explanation', contextNote: 'This is a brief guide; read the surrounding passage for the full context.', genericExplanation: 'This verse invites us to reflect on God’s message and apply it wisely in daily life.' }
+    };
+    Object.assign(translations.ht, { chooseCommentary: 'Chwazi kòmantè a', commentary: 'Kòmantè Matthew Henry (an angle)', commentaryMissing: 'Kòmantè offline a poko chaje. Chwazi fichye mhc-commentary.json pou li eksplikasyon an.', readMore: 'Li kòmantè a nèt', contextNote: 'Kòmantè sa a se yon sous istorik; li pasaj la li menm pou tout kontèks la.' });
+    Object.assign(translations.en, { chooseCommentary: 'Choose commentary file', commentary: 'Matthew Henry Commentary (English)', commentaryMissing: 'The offline commentary is not loaded. Choose mhc-commentary.json to read this explanation.', readMore: 'Read full commentary', contextNote: 'This commentary is a historical source; read the passage itself for full context.' });
+    const t = (key, variables = {}) => (translations[language][key] || translations.ht[key] || key).replace(/\{(\w+)\}/g, (_, name) => variables[name] ?? '');
+    function setLanguage(nextLanguage) {
+      language = nextLanguage; document.documentElement.lang = language;
+      document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(element => { element.placeholder = t(element.dataset.i18nPlaceholder); });
+      document.querySelectorAll('.language-button').forEach(button => { button.className = `language-button rounded-md px-2 py-1 ${button.dataset.language === language ? 'bg-white/20 text-white' : 'text-indigo-200 hover:text-white'}`; });
+      $('englishBiblePicker').innerHTML = `<label class="cursor-pointer underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">${t('chooseKjv')} <input id="englishFileInput" type="file" accept="application/json,.json" class="sr-only" /></label><span class="mx-1.5 text-indigo-300">${t('or')}</span><a href="kjv-1769.json" download="kjv-1769.json" class="underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">${t('download')}</a>`;
+      $('commentaryPicker').innerHTML = `<label class="cursor-pointer underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">${t('chooseCommentary')} <input id="commentaryFileInput" type="file" accept="application/json,.json" class="sr-only" /></label><span class="mx-1.5 text-indigo-300">${t('or')}</span><a href="mhc-commentary.json" download="mhc-commentary.json" class="underline decoration-indigo-300 underline-offset-4 hover:text-indigo-100">${t('download')}</a>`;
+      bindEnglishFilePicker();
+      bindCommentaryFilePicker();
+      if (bibleData.length) { statusText.textContent = t('ready'); $('dataBadge').textContent = englishBibleData.length ? t('kjvLoaded', { hcv: bibleData.length.toLocaleString(), kjv: englishBibleData.length.toLocaleString() }) : t('hcvLoaded', { count: bibleData.length.toLocaleString() }); }
+      if (!$('resultsPanel').classList.contains('hidden')) search();
+    }
+    const searchInput = $('searchInput'), statusText = $('statusText'), uploadPanel = $('uploadPanel');
+    const welcomePanel = $('welcomePanel'), resultsPanel = $('resultsPanel'), resultsCount = $('resultsCount');
+    const versesDisplay = $('versesDisplay'), clearButton = $('clearButton');
+    const aliases = { genesis: 'jenez', genese: 'jenez', john: 'jan', jean: 'jan', matthew: 'matye', matthieu: 'matye', psalms: 'som', psaumes: 'som', luke: 'lik', luc: 'lik', mark: 'mak', marc: 'mak', peter: 'pye', pierre: 'pye', james: 'jak', jacques: 'jak', revelation: 'revelasyon', apocalypse: 'revelasyon' };
+    // Offline English-to-Creole Bible vocabulary. Add terms here as the search vocabulary grows.
+    const englishTerms = {
+      god: ['bondye'], jesus: ['jezi'], christ: ['kris'], lord: ['senye'], savior: ['sove', 'sove'],
+      love: ['renmen'], loved: ['renmen'], loves: ['renmen'], loving: ['renmen'], world: ['lemonn'],
+      faith: ['lafwa'], hope: ['espwa'], peace: ['lape'], grace: ['gras'], mercy: ['mizerikod'],
+      pray: ['priye', 'lapriye'], prayer: ['lapriye'], forgive: ['padonnen'], forgiveness: ['padon'],
+      salvation: ['delivrans', 'sali'], save: ['sove'], saved: ['sove'], heaven: ['syel'], earth: ['te'],
+      kingdom: ['wayom'], holy: ['sen'], spirit: ['lespri'], sin: ['peche'], truth: ['verite'],
+      life: ['lavi'], eternal: ['eternel'], everlasting: ['eternel'], word: ['pawol'], light: ['limye'],
+      darkness: ['fenwa'], heart: ['ke'], soul: ['nanm'], church: ['legliz'], gospel: ['levanjil'],
+      cross: ['kwa'], resurrection: ['rezireksyon'], death: ['lanmo'], father: ['papa'], son: ['pitit'],
+      mother: ['manman'], brother: ['fre'], sister: ['se'], king: ['wa'], shepherd: ['beje']
+    };
+    const englishPhrases = {
+      'god is love': ['bondye se renmen'], 'god loves you': ['bondye renmen ou'],
+      'eternal life': ['lavi eternel'], 'everlasting life': ['lavi eternel'],
+      'holy spirit': ['lespri sen', 'sentespri'], 'kingdom of god': ['wayom Bondye'],
+      'the word of god': ['pawol Bondye'], 'peace of god': ['lape Bondye'],
+      'for god so loved the world': ['bondye sitelman renmen lemonn']
+    };
+    const englishBookToCreole = {
+      genesis: 'jenez', exodus: 'egzod', leviticus: 'levitik', numbers: 'nonb', deuteronomy: 'detewonom', joshua: 'jozye', judges: 'jij', ruth: 'rit',
+      '1 samuel': '1 samyel', '2 samuel': '2 samyel', '1 kings': '1 wa', '2 kings': '2 wa', '1 chronicles': '1 kwonik', '2 chronicles': '2 kwonik', ezra: 'ezra', nehemiah: 'neyemi', esther: 'este', job: 'job', psalms: 'som', proverbs: 'pwoveb', ecclesiastes: 'eklezyas', 'song of solomon': 'chante salomon', isaiah: 'ezayi', jeremiah: 'jeremi', lamentations: 'lamantasyon', ezekiel: 'ezekyel', daniel: 'danyel', hosea: 'oze', joel: 'jowel', amos: 'amos', obadiah: 'abdyas', jonah: 'jonas', micah: 'miche', nahum: 'nawoum', habakkuk: 'abakouk', zephaniah: 'sofoni', haggai: 'aje', zechariah: 'zakari', malachi: 'malaki',
+      matthew: 'matye', mark: 'mak', luke: 'lik', john: 'jan', acts: 'travay', romans: 'women', '1 corinthians': '1 korentyen', '2 corinthians': '2 korentyen', galatians: 'galat', ephesians: 'efezyen', philippians: 'filipyen', colossians: 'kolosyen', '1 thessalonians': '1 tesalonisyen', '2 thessalonians': '2 tesalonisyen', '1 timothy': '1 timote', '2 timothy': '2 timote', titus: 'tit', philemon: 'filemon', hebrews: 'ebre', james: 'jak', '1 peter': '1 pye', '2 peter': '2 pye', '1 john': '1 jan', '2 john': '2 jan', '3 john': '3 jan', jude: 'jid', revelation: 'revelasyon'
+    };
+    // Each emotion expands into related Creole ideas, so searches can find comfort as well as a literal emotion word.
+    const emotionMap = {
+      'tristès': { triggers: ['sad', 'sadness', 'sorrow', 'grief', 'grieving', 'depressed', 'depression', 'lonely', 'alone', 'tris', 'tristes', 'lapenn'], terms: ['tris', 'lapenn', 'soufri', 'kriye', 'konsole', 'konsolasyon'] },
+      'kè sote': { triggers: ['afraid', 'fear', 'scared', 'frightened', 'anxious', 'anxiety', 'worried', 'worry', 'panic', 'fearful', 'pe', 'krent', 'enkyet', 'angwas'], terms: ['pe', 'krent', 'enkyete', 'angwas', 'tranble', 'pwoteksyon', 'sekurite'] },
+      'kòlè': { triggers: ['angry', 'anger', 'mad', 'furious', 'rage', 'irritated', 'kole', 'fache'], terms: ['kole', 'fache', 'move', 'raj', 'kale'] },
+      'espwa': { triggers: ['hopeless', 'hopelessness', 'despair', 'discouraged', 'hope', 'hopeful', 'espwa', 'dekouraje'], terms: ['espwa', 'konfyans', 'ankouraje', 'delivrans', 'sekou'] },
+      'kè kontan': { triggers: ['happy', 'happiness', 'joy', 'joyful', 'glad', 'grateful', 'thankful', 'kontan', 'lajwa', 'rekonesan'], terms: ['kontan', 'lajwa', 'rejwi', 'rekonesans', 'benediksyon'] },
+      'koupab': { triggers: ['guilt', 'guilty', 'shame', 'ashamed', 'regret', 'koupab', 'wont', 'remorse'], terms: ['peche', 'padon', 'padonnen', 'wont', 'repanti'] }
+    };
+    const questionTopics = {
+      'lanmou': { triggers: ['love', 'loves', 'loving', 'beloved', 'lanmou', 'renmen', 'charite'], terms: ['renmen', 'lanmou', 'charite'] },
+      'lafwa': { triggers: ['faith', 'believe', 'belief', 'trust', 'lafwa', 'kwè', 'konfyans'], terms: ['lafwa', 'kwè', 'konfyans'] },
+      'lapriyè': { triggers: ['pray', 'prayer', 'praying', 'lapriye', 'priye'], terms: ['lapriye', 'priye'] },
+      'padon': { triggers: ['forgive', 'forgiveness', 'forgiven', 'pardon', 'padon', 'padonnen'], terms: ['padon', 'padonnen', 'mizerikod'] },
+      'espwa': { triggers: ['hope', 'hopeless', 'despair', 'espwa', 'dekouraje'], terms: ['espwa', 'ankouraje', 'konfyans', 'sekou'] },
+      'laperèz': { triggers: ['fear', 'afraid', 'anxiety', 'anxious', 'worried', 'pe', 'krent', 'enkyet'], terms: ['pe', 'krent', 'pwoteksyon', 'sekurite', 'konfyans'] },
+      'delivrans': { triggers: ['salvation', 'saved', 'save', 'savior', 'deliverance', 'delivrans', 'sove', 'sove'], terms: ['delivrans', 'sove', 'sali'] },
+      'lapè': { triggers: ['peace', 'peaceful', 'lape'], terms: ['lape', 'repo', 'trankil'] },
+      'fanmi': { triggers: ['family', 'marriage', 'husband', 'wife', 'children', 'parent', 'fanmi', 'maryaj', 'mari', 'madanm', 'pitit'], terms: ['fanmi', 'mari', 'madanm', 'pitit', 'papa', 'manman'] },
+      'syèl': { triggers: ['heaven', 'heavens', 'paradise', 'syel', 'syèl', 'paradi'], terms: ['syel', 'paradi', 'wayom'] }
+    };
+    const explanationThemes = [
+      { words: ['renmen', 'lanmou', 'charite'], ht: 'lanmou Bondye ak lanmou pou lòt moun', en: 'God’s love and love for others' },
+      { words: ['lafwa', 'kwe', 'konfyans'], ht: 'lafwa ak konfyans nan Bondye', en: 'faith and trust in God' },
+      { words: ['lapriye', 'priye'], ht: 'lapriyè ak depandans sou Bondye', en: 'prayer and dependence on God' },
+      { words: ['padon', 'padonnen', 'mizerikod'], ht: 'padon ak mizèrikòd', en: 'forgiveness and mercy' },
+      { words: ['espwa', 'ankouraje', 'sekou'], ht: 'espwa ak ankourajman', en: 'hope and encouragement' },
+      { words: ['pe', 'krent', 'enkyete', 'angwas'], ht: 'laperèz ak konfyans nan pwoteksyon Bondye', en: 'fear and trust in God’s protection' },
+      { words: ['syel', 'paradi', 'wayom'], ht: 'syèl la ak Wayòm Bondye a', en: 'heaven and God’s kingdom' }
+    ];
+    const fillerWords = new Set(['a', 'about', 'am', 'an', 'and', 'are', 'as', 'at', 'be', 'bible', 'by', 'can', 'does', 'for', 'from', 'how', 'i', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'or', 'say', 'tell', 'that', 'the', 'to', 'what', 'was', 'with', 'you', 'your', 'ak', 'an', 'ap', 'av', 'bib', 'de', 'e', 'en', 'eske', 'ki', 'kisa', 'la', 'le', 'li', 'm', 'mwen', 'nan', 'nou', 'ou', 'pou', 'se', 'sou', 'te', 'yon']);
+
+    const normalize = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const searchableText = (value) => normalize(value).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
+    const escapeHTML = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    function editDistance(a, b) {
+      const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+      for (let i = 1; i <= a.length; i++) { let previous = row[0]++; for (let j = 1; j <= b.length; j++) { const saved = row[j]; row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1)); previous = saved; } }
+      return row[b.length];
+    }
+    function closestBook(typed) {
+      const normalized = normalize(typed); if (aliases[normalized]) return aliases[normalized];
+      let result = normalized, distance = 3;
+      uniqueBooks.forEach(book => { const candidate = normalize(book), score = editDistance(normalized, candidate); if (score < distance) { distance = score; result = candidate; } });
+      return result;
+    }
+    function highlight(text, keywords) {
+      let html = escapeHTML(text);
+      keywords.filter(word => word.length > 2).forEach(word => { html = html.replace(new RegExp(`(${escapeRegex(escapeHTML(word))})`, 'gi'), '<mark class="rounded bg-amber-100 px-0.5 text-inherit">$1</mark>'); });
+      return html;
+    }
+    function englishSearch(rawQuery) {
+      const normalized = normalize(rawQuery);
+      const phraseMatches = Object.entries(englishPhrases)
+        .filter(([english]) => normalized.includes(english))
+        .map(([, creole]) => creole.map(normalize));
+      const wordGroups = normalized.split(/\s+/).filter(word => englishTerms[word]).map(word => englishTerms[word].map(normalize));
+      const translated = [...phraseMatches, ...wordGroups];
+      return { phraseMatches, wordGroups, usedEnglish: translated.length > 0, highlightTerms: [...new Set(translated.flat())] };
+    }
+    function emotionSearch(rawQuery) {
+      const queryWords = new Set(searchableText(rawQuery).split(' '));
+      const matches = Object.entries(emotionMap).filter(([, emotion]) => emotion.triggers.some(trigger => queryWords.has(trigger)));
+      return {
+        groups: matches.map(([, emotion]) => emotion.terms.map(normalize)),
+        labels: matches.map(([label]) => label),
+        highlightTerms: [...new Set(matches.flatMap(([, emotion]) => emotion.terms.map(normalize)))]
+      };
+    }
+    function questionTopic(rawQuestion) {
+      const queryWords = new Set(searchableText(rawQuestion).split(' '));
+      return Object.entries(questionTopics).map(([label, topic]) => ({ label, ...topic })).find(topic => topic.triggers.some(trigger => queryWords.has(trigger))) || null;
+    }
+    function askQuestion() {
+      const question = $('questionInput').value.trim(), help = $('questionHelp');
+      activeQuestionTopic = questionTopic(question);
+      if (!activeQuestionTopic) {
+        const terms = meaningfulWords(question);
+        if (!terms.length) { help.textContent = t('questionHelp'); help.classList.remove('hidden'); return; }
+        activeQuestionTopic = { label: question, terms, generic: true };
+      }
+      help.classList.add('hidden'); searchInput.value = activeQuestionTopic.generic ? question : ''; search(); resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function meaningfulWords(value) {
+      const terms = searchableText(value).split(' ').filter(word => word.length > 1 && !fillerWords.has(word));
+      return terms.length ? terms : searchableText(value).split(' ').filter(Boolean);
+    }
+    function closenessScore(verseText, terms) {
+      const positions = terms.map(term => verseText.indexOf(term)).filter(position => position >= 0);
+      return positions.length < 2 ? 100 : 700 - (Math.max(...positions) - Math.min(...positions));
+    }
+    function explainVerse(verse) {
+      const verseText = searchableText(verse.text);
+      const themes = explanationThemes.filter(theme => theme.words.some(word => verseText.includes(word)));
+      const theme = themes[0];
+      if (!theme) return t('genericExplanation');
+      if (language === 'en') return `This verse highlights ${theme.en}. In simple terms, it points readers toward a faithful response to God in everyday life.`;
+      return `Vèsè sa a mete aksan sou ${theme.ht}. An mo senp, li ankouraje moun k ap li a reponn Bondye avèk lafwa nan lavi chak jou.`;
+    }
+    function initialise(data) {
+      if (!data || !Array.isArray(data.verses)) throw new Error('Fòma fichye a pa kòrèk.');
+      bibleData = data.verses.filter(v => v && v.book_name && v.chapter != null && v.verse != null && v.text != null).map(v => ({ ...v, book_name: String(v.book_name).trim() }));
+      if (!bibleData.length) throw new Error('Pa gen vèsè nan fichye a.');
+      uniqueBooks = [...new Set(bibleData.map(v => v.book_name))];
+      $('dataBadge').textContent = t('hcvLoaded', { count: bibleData.length.toLocaleString() });
+      statusText.textContent = t('ready'); uploadPanel.classList.add('hidden'); searchInput.disabled = false; searchInput.focus();
+      if (!hasSearchListener) { searchInput.addEventListener('input', () => { activeQuestionTopic = null; search(); }); hasSearchListener = true; }
+      loadEnglishBible();
+      loadCommentary();
+    }
+    function initialiseEnglishBible(data) {
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Fòma Bib anglè a pa kòrèk.');
+      englishBibleData = Object.entries(data).map(([reference, text]) => {
+        const match = reference.match(/^(.*)\s+(\d+):(\d+)$/);
+        return match ? { book: match[1], chapter: Number(match[2]), verse: Number(match[3]), text: String(text).replace(/[#\[\]]/g, '') } : null;
+      }).filter(Boolean);
+      if (!englishBibleData.length) throw new Error('Pa gen vèsè anglè nan fichye a.');
+      $('dataBadge').textContent = t('kjvLoaded', { hcv: bibleData.length.toLocaleString(), kjv: englishBibleData.length.toLocaleString() });
+      $('englishBiblePicker').classList.add('hidden');
+    }
+    function creoleVerseForEnglish(englishVerse) {
+      const expectedBook = englishBookToCreole[normalize(englishVerse.book)] || englishVerse.book;
+      const actualBook = uniqueBooks.find(book => normalize(book) === normalize(expectedBook)) || uniqueBooks.find(book => normalize(book) === getClosestBookName(expectedBook));
+      return bibleData.find(verse => verse.book_name === actualBook && Number(verse.chapter) === englishVerse.chapter && Number(verse.verse) === englishVerse.verse);
+    }
+    function initialiseCommentary(data) {
+      if (!data?.sections || typeof data.sections !== 'object') throw new Error('Commentary format is invalid.');
+      commentaryData = data;
+      $('commentaryPicker').classList.add('hidden');
+      if (!resultsPanel.classList.contains('hidden')) search();
+    }
+    function commentaryForVerse(verse) {
+      if (!commentaryData?.sections) return null;
+      const englishBook = Object.entries(englishBookToCreole).find(([book, creole]) => normalize(creole) === normalize(verse.book_name) || normalize(book) === normalize(verse.book_name))?.[0];
+      if (!englishBook) return null;
+      const sourceBook = Object.keys(commentaryData.sections).find(book => normalize(book) === normalize(englishBook));
+      const chapter = sourceBook && commentaryData.sections[sourceBook]?.[String(verse.chapter)];
+      const directMatch = chapter?.find(section => Number(verse.verse) >= section.start && Number(verse.verse) <= section.end);
+      const precedingMatch = chapter?.filter(section => section.start <= Number(verse.verse)).at(-1);
+      return (directMatch || precedingMatch)?.text || null;
+    }
+    function commentaryPreview(text) {
+      const cutoff = text.indexOf('. ', 440);
+      return cutoff > 0 ? `${text.slice(0, cutoff + 1)}` : text.slice(0, 520);
+    }
+    function commentaryMarkup(verse) {
+      const commentary = commentaryForVerse(verse);
+      if (!commentary) return `<div class="mt-5 rounded-xl border border-amber-100 bg-amber-50 p-4"><p class="text-xs font-bold uppercase tracking-[.15em] text-amber-700">${t('commentary')}</p><p class="mt-1.5 text-sm leading-6 text-slate-600">${t('commentaryMissing')}</p></div>`;
+      const preview = commentaryPreview(commentary);
+      const full = escapeHTML(commentary).replace(/\n\n/g, '</p><p class="mt-3">').replace(/\n/g, '<br>');
+      return `<div class="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4"><p class="text-xs font-bold uppercase tracking-[.15em] text-indigo-700">${t('commentary')}</p><p class="mt-1.5 text-sm leading-6 text-slate-600">${escapeHTML(preview)}</p>${commentary.length > preview.length ? `<details class="mt-3 text-sm leading-6 text-slate-600"><summary class="cursor-pointer font-semibold text-indigo-700">${t('readMore')}</summary><div class="mt-3"><p>${full}</p></div></details>` : ''}<p class="mt-3 text-xs leading-5 text-slate-400">${t('contextNote')}</p></div>`;
+    }
+    function englishVerseMatches(rawQuery) {
+      if (!englishBibleData.length) return [];
+      const phrase = searchableText(rawQuery), terms = meaningfulWords(rawQuery);
+      return englishBibleData.map(verse => {
+        const verseText = searchableText(verse.text), exact = phrase.split(' ').length > 2 && verseText.includes(phrase);
+        const words = terms.filter(term => verseText.includes(term));
+        const requiredWords = terms.length === 1 ? 1 : Math.max(2, Math.ceil(terms.length * 0.7));
+        if (!exact && words.length < requiredWords) return null;
+        const creoleVerse = creoleVerseForEnglish(verse);
+        return creoleVerse ? { verse: creoleVerse, score: exact ? 8500 : 400 + (words.length * 20), englishMatch: true } : null;
+      }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 100);
+    }
+    function search() {
+      const raw = searchInput.value.trim();
+      if (raw.length < 2 && !activeQuestionTopic) { resultsPanel.classList.add('hidden'); welcomePanel.classList.remove('hidden'); clearButton.classList.add('hidden'); return; }
+      welcomePanel.classList.add('hidden'); resultsPanel.classList.remove('hidden'); clearButton.classList.remove('hidden');
+      const ref = raw.match(/^([\d]*\s*[a-zA-ZÀ-ÿ]+)\s*(\d+)?[:\s]*(\d+)?$/i);
+      const refQuery = ref ? `${closestBook(ref[1])} ${ref[2] || ''} ${ref[3] || ''}`.trim() : normalize(raw);
+      const rawPhrase = searchableText(raw);
+      const words = meaningfulWords(raw);
+      const english = englishSearch(raw);
+      const emotion = emotionSearch(raw);
+      const creoleMatches = bibleData.map(v => {
+        const book = normalize(v.book_name), reference = [`${book} ${v.chapter}:${v.verse}`, `${book} ${v.chapter} ${v.verse}`, `${book} ${v.chapter}`];
+        const verseText = searchableText(v.text);
+        const referenceMatch = Boolean(ref) && reference.some(item => item.includes(refQuery));
+        const exactPhraseMatch = rawPhrase.split(' ').length > 1 && verseText.includes(rawPhrase);
+        const directTextMatch = words.length > 0 && words.every(word => verseText.includes(word));
+        const phraseMatch = english.phraseMatches.length > 0 && english.phraseMatches.every(group => group.some(term => verseText.includes(term)));
+        const wordMatch = english.wordGroups.length > 0 && english.wordGroups.every(group => group.some(term => verseText.includes(term)));
+        const englishTextMatch = phraseMatch || wordMatch;
+        const emotionTextMatch = emotion.groups.length > 0 && emotion.groups.every(group => group.some(term => verseText.includes(term)));
+        const topicTextMatch = activeQuestionTopic && activeQuestionTopic.terms.some(term => verseText.includes(normalize(term)));
+        if (!referenceMatch && !exactPhraseMatch && !directTextMatch && !englishTextMatch && !emotionTextMatch && !topicTextMatch) return null;
+        const score = referenceMatch ? 10000 : exactPhraseMatch ? 9000 : directTextMatch ? closenessScore(verseText, words) : topicTextMatch ? 500 : emotionTextMatch ? 350 : 200;
+        return { verse: v, score, exactPhraseMatch };
+      }).filter(Boolean);
+      const seenReferences = new Set(creoleMatches.map(match => `${normalize(match.verse.book_name)}|${match.verse.chapter}|${match.verse.verse}`));
+      const englishMatches = englishVerseMatches(raw).filter(match => {
+        const key = `${normalize(match.verse.book_name)}|${match.verse.chapter}|${match.verse.verse}`;
+        if (seenReferences.has(key)) return false; seenReferences.add(key); return true;
+      });
+      const matches = [...creoleMatches, ...englishMatches].sort((a, b) => b.score - a.score);
+      const displayLimit = activeQuestionTopic ? matches.length : 100;
+      const shown = matches.slice(0, displayLimit);
+      const languageNote = (english.usedEnglish || englishMatches.length) ? t('english') : '';
+      const phraseNote = shown.some(match => match.exactPhraseMatch) ? t('phraseFirst') : '';
+      const emotionNote = emotion.labels.length ? t('emotion', { emotion: emotion.labels.join(', ') }) : '';
+      const topicName = activeQuestionTopic ? (activeQuestionTopic.generic ? activeQuestionTopic.label : t(`topic_${activeQuestionTopic.label}`)) : '';
+      const topicNote = activeQuestionTopic ? t('about', { topic: topicName }) : '';
+      resultsCount.textContent = matches.length ? `${t('found', { count: matches.length.toLocaleString() })}${topicNote}${languageNote}${emotionNote}${phraseNote}${matches.length > displayLimit ? t('showing', { count: displayLimit }) : ''}` : activeQuestionTopic ? t('noTopic', { topic: topicName }) : t('noResults', { query: raw });
+      const highlightTerms = [...new Set([...(english.usedEnglish ? english.highlightTerms : words), ...emotion.highlightTerms, ...(activeQuestionTopic?.terms || [])])];
+      versesDisplay.innerHTML = shown.map(({ verse: v }, i) => `<article class="verse-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6" style="animation-delay:${Math.min(i * 30, 300)}ms"><div class="mb-3 flex items-center gap-3"><span class="h-px w-5 bg-indigo-300"></span><p class="text-xs font-bold uppercase tracking-[.15em] text-indigo-700">${escapeHTML(v.book_name)} ${escapeHTML(v.chapter)}:${escapeHTML(v.verse)}</p></div><p class="font-display text-lg leading-8 text-slate-700 sm:text-xl">${ref ? escapeHTML(v.text) : highlight(v.text, highlightTerms)}</p>${commentaryMarkup(v)}</article>`).join('');
+    }
+    async function loadDefault() {
+      try { let response; for (const path of ['hcv.json', '../hcv.json']) { response = await fetch(path); if (response.ok) break; } if (!response?.ok) throw new Error(); initialise(await response.json()); }
+      catch { statusText.textContent = t('chooseBible'); $('dataBadge').textContent = t('chooseFile'); uploadPanel.classList.remove('hidden'); }
+    }
+    async function loadEnglishBible() {
+      if (englishBibleData.length) return;
+      try { let response; for (const path of ['kjv-1769.json', '../kjv-1769.json']) { response = await fetch(path); if (response.ok) break; } if (!response?.ok) throw new Error(); initialiseEnglishBible(await response.json()); }
+      catch { $('englishBiblePicker').classList.remove('hidden'); }
+    }
+    async function loadCommentary() {
+      if (commentaryData) return;
+      try { let response; for (const path of ['mhc-commentary.json', '../mhc-commentary.json']) { response = await fetch(path); if (response.ok) break; } if (!response?.ok) throw new Error(); initialiseCommentary(await response.json()); }
+      catch { $('commentaryPicker').classList.remove('hidden'); }
+    }
+    function bindEnglishFilePicker() {
+      const picker = $('englishFileInput');
+      picker.onchange = event => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { initialiseEnglishBible(JSON.parse(reader.result)); search(); } catch (error) { statusText.textContent = error.message || 'English Bible file is invalid.'; } }; reader.readAsText(file); };
+    }
+    function bindCommentaryFilePicker() {
+      const picker = $('commentaryFileInput');
+      picker.onchange = event => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { initialiseCommentary(JSON.parse(reader.result)); } catch (error) { statusText.textContent = error.message || 'Commentary file is invalid.'; } }; reader.readAsText(file); };
+    }
+    $('fileInput').addEventListener('change', event => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { initialise(JSON.parse(reader.result)); } catch (error) { statusText.textContent = error.message || 'Fichye a pa valab.'; } }; reader.readAsText(file); });
+    document.querySelectorAll('.language-button').forEach(button => button.addEventListener('click', () => setLanguage(button.dataset.language)));
+    document.querySelectorAll('.example').forEach(button => button.addEventListener('click', () => { if (!searchInput.disabled) { activeQuestionTopic = null; searchInput.value = button.textContent; search(); searchInput.focus(); } }));
+    $('askButton').addEventListener('click', askQuestion);
+    $('questionInput').addEventListener('keydown', event => { if (event.key === 'Enter') askQuestion(); });
+    clearButton.addEventListener('click', () => { activeQuestionTopic = null; searchInput.value = ''; search(); searchInput.focus(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { activeQuestionTopic = null; searchInput.value = ''; search(); searchInput.blur(); } else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); searchInput.focus(); } });
+    setLanguage('ht');
+    statusText.textContent = t('loading');
+    loadDefault();
+  </script>
+// Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</body>
+</html>
