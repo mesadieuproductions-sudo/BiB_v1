@@ -133,9 +133,10 @@
     const welcomePanel = $('welcomePanel'), resultsPanel = $('resultsPanel'), resultsCount = $('resultsCount');
     const versesDisplay = $('versesDisplay'), clearButton = $('clearButton');
     const aliases = { genesis: 'jenez', genese: 'jenez', john: 'jan', jean: 'jan', matthew: 'matye', matthieu: 'matye', psalms: 'som', psaumes: 'som', luke: 'lik', luc: 'lik', mark: 'mak', marc: 'mak', peter: 'pye', pierre: 'pye', james: 'jak', jacques: 'jak', revelation: 'revelasyon', apocalypse: 'revelasyon' };
-    // Offline English-to-Creole Bible vocabulary. Add terms here as the search vocabulary grows.
+    
+    // Expanded English-to-Creole Bible vocabulary
     const englishTerms = {
-      god: ['bondye'], jesus: ['jezi'], christ: ['kris'], lord: ['senye'], savior: ['sove', 'sove'],
+      god: ['bondye'], jesus: ['jezi'], christ: ['kris'], lord: ['senye'], savior: ['sove'],
       love: ['renmen'], loved: ['renmen'], loves: ['renmen'], loving: ['renmen'], world: ['lemonn'],
       faith: ['lafwa'], hope: ['espwa'], peace: ['lape'], grace: ['gras'], mercy: ['mizerikod'],
       pray: ['priye', 'lapriye'], prayer: ['lapriye'], forgive: ['padonnen'], forgiveness: ['padon'],
@@ -144,7 +145,10 @@
       life: ['lavi'], eternal: ['eternel'], everlasting: ['eternel'], word: ['pawol'], light: ['limye'],
       darkness: ['fenwa'], heart: ['ke'], soul: ['nanm'], church: ['legliz'], gospel: ['levanjil'],
       cross: ['kwa'], resurrection: ['rezireksyon'], death: ['lanmo'], father: ['papa'], son: ['pitit'],
-      mother: ['manman'], brother: ['fre'], sister: ['se'], king: ['wa'], shepherd: ['beje']
+      mother: ['manman'], brother: ['fre'], sister: ['se'], king: ['wa'], shepherd: ['beje'],
+      righteousness: ['jistis'], redeem: ['rachte'], blood: ['san'], body: ['ko'], bread: ['pen'],
+      water: ['dlo'], fire: ['dife'], glory: ['glwa'], power: ['pouvwa', 'fos'], strength: ['fos'],
+      joy: ['lajwa'], rejoice: ['rejwi'], praise: ['louwe'], trust: ['konfyans', 'kwe'], follow: ['swiv']
     };
     const englishPhrases = {
       'god is love': ['bondye se renmen'], 'god loves you': ['bondye renmen ou'],
@@ -156,9 +160,8 @@
     const englishBookToCreole = {
       genesis: 'jenez', exodus: 'egzod', leviticus: 'levitik', numbers: 'nonb', deuteronomy: 'detewonom', joshua: 'jozye', judges: 'jij', ruth: 'rit',
       '1 samuel': '1 samyel', '2 samuel': '2 samyel', '1 kings': '1 wa', '2 kings': '2 wa', '1 chronicles': '1 kwonik', '2 chronicles': '2 kwonik', ezra: 'ezra', nehemiah: 'neyemi', esther: 'este', job: 'job', psalms: 'som', proverbs: 'pwoveb', ecclesiastes: 'eklezyas', 'song of solomon': 'chante salomon', isaiah: 'ezayi', jeremiah: 'jeremi', lamentations: 'lamantasyon', ezekiel: 'ezekyel', daniel: 'danyel', hosea: 'oze', joel: 'jowel', amos: 'amos', obadiah: 'abdyas', jonah: 'jonas', micah: 'miche', nahum: 'nawoum', habakkuk: 'abakouk', zephaniah: 'sofoni', haggai: 'aje', zechariah: 'zakari', malachi: 'malaki',
-      matthew: 'matye', mark: 'mak', luke: 'lik', john: 'jan', acts: 'travay', romans: 'women', '1 corinthians': '1 korentyen', '2 corinthians': '2 korentyen', galatians: 'galat', ephesians: 'efezyen', philippians: 'filipyen', colossians: 'kolosyen', '1 thessalonians': '1 tesalonisyen', '2 thessalonians': '2 tesalonisyen', '1 timothy': '1 timote', '2 timothy': '2 timote', titus: 'tit', philemon: 'filemon', hebrews: 'ebre', james: 'jak', '1 peter': '1 pye', '2 peter': '2 pye', '1 john': '1 jan', '2 john': '2 jan', '3 john': '3 jan', jude: 'jid', revelation: 'revelasyon'
+      matthew: 'matye', mark: 'mak', luke: 'lik', john: 'jan', acts: 'travay', romans: 'women', '1 corinthians': '1 korentyen', '2 corinthians': '2 korentyen', galatians: 'galat', ephesians: 'efezyen', philippians: 'filipyen', colossians: 'kolosyen', '1 thessalonians': '1 tesalonisyen', '2 thessalonisyen': '2 tesalonisyen', '1 timothy': '1 timote', '2 timote': '2 timote', titus: 'tit', philemon: 'filemon', hebrews: 'ebre', james: 'jak', '1 peter': '1 pye', '2 pye': '2 pye', '1 jan': '1 jan', '2 jan': '2 jan', '3 jan': '3 jan', jude: 'jid', revelation: 'revelasyon'
     };
-    // Each emotion expands into related Creole ideas, so searches can find comfort as well as a literal emotion word.
     const emotionMap = {
       'tristès': { triggers: ['sad', 'sadness', 'sorrow', 'grief', 'grieving', 'depressed', 'depression', 'lonely', 'alone', 'tris', 'tristes', 'lapenn'], terms: ['tris', 'lapenn', 'soufri', 'kriye', 'konsole', 'konsolasyon'] },
       'kè sote': { triggers: ['afraid', 'fear', 'scared', 'frightened', 'anxious', 'anxiety', 'worried', 'worry', 'panic', 'fearful', 'pe', 'krent', 'enkyet', 'angwas'], terms: ['pe', 'krent', 'enkyete', 'angwas', 'tranble', 'pwoteksyon', 'sekurite'] },
@@ -174,7 +177,7 @@
       'padon': { triggers: ['forgive', 'forgiveness', 'forgiven', 'pardon', 'padon', 'padonnen'], terms: ['padon', 'padonnen', 'mizerikod'] },
       'espwa': { triggers: ['hope', 'hopeless', 'despair', 'espwa', 'dekouraje'], terms: ['espwa', 'ankouraje', 'konfyans', 'sekou'] },
       'laperèz': { triggers: ['fear', 'afraid', 'anxiety', 'anxious', 'worried', 'pe', 'krent', 'enkyet'], terms: ['pe', 'krent', 'pwoteksyon', 'sekurite', 'konfyans'] },
-      'delivrans': { triggers: ['salvation', 'saved', 'save', 'savior', 'deliverance', 'delivrans', 'sove', 'sove'], terms: ['delivrans', 'sove', 'sali'] },
+      'delivrans': { triggers: ['salvation', 'saved', 'save', 'savior', 'deliverance', 'delivrans', 'sove'], terms: ['delivrans', 'sove', 'sali'] },
       'lapè': { triggers: ['peace', 'peaceful', 'lape'], terms: ['lape', 'repo', 'trankil'] },
       'fanmi': { triggers: ['family', 'marriage', 'husband', 'wife', 'children', 'parent', 'fanmi', 'maryaj', 'mari', 'madanm', 'pitit'], terms: ['fanmi', 'mari', 'madanm', 'pitit', 'papa', 'manman'] },
       'syèl': { triggers: ['heaven', 'heavens', 'paradise', 'syel', 'syèl', 'paradi'], terms: ['syel', 'paradi', 'wayom'] }
@@ -251,13 +254,10 @@
       const positions = terms.map(term => verseText.indexOf(term)).filter(position => position >= 0);
       return positions.length < 2 ? 100 : 700 - (Math.max(...positions) - Math.min(...positions));
     }
-    function explainVerse(verse) {
-      const verseText = searchableText(verse.text);
-      const themes = explanationThemes.filter(theme => theme.words.some(word => verseText.includes(word)));
-      const theme = themes[0];
-      if (!theme) return t('genericExplanation');
-      if (language === 'en') return `This verse highlights ${theme.en}. In simple terms, it points readers toward a faithful response to God in everyday life.`;
-      return `Vèsè sa a mete aksan sou ${theme.ht}. An mo senp, li ankouraje moun k ap li a reponn Bondye avèk lafwa nan lavi chak jou.`;
+    function getEnglishVerseText(verse) {
+      if (!englishBibleData.length) return null;
+      const found = englishBibleData.find(v => normalize(v.book) === normalize(verse.book_name) && Number(v.chapter) === Number(verse.chapter) && Number(v.verse) === Number(verse.verse));
+      return found ? found.text : null;
     }
     function initialise(data) {
       if (!data || !Array.isArray(data.verses)) throw new Error('Fòma fichye a pa kòrèk.');
@@ -282,7 +282,7 @@
     }
     function creoleVerseForEnglish(englishVerse) {
       const expectedBook = englishBookToCreole[normalize(englishVerse.book)] || englishVerse.book;
-      const actualBook = uniqueBooks.find(book => normalize(book) === normalize(expectedBook)) || uniqueBooks.find(book => normalize(book) === getClosestBookName(expectedBook));
+      const actualBook = uniqueBooks.find(book => normalize(book) === normalize(expectedBook)) || uniqueBooks.find(book => normalize(book) === getClosestBookName ? getClosestBookName(expectedBook) : closestBook(expectedBook));
       return bibleData.find(verse => verse.book_name === actualBook && Number(verse.chapter) === englishVerse.chapter && Number(verse.verse) === englishVerse.verse);
     }
     function initialiseCommentary(data) {
@@ -318,7 +318,7 @@
       return englishBibleData.map(verse => {
         const verseText = searchableText(verse.text), exact = phrase.split(' ').length > 2 && verseText.includes(phrase);
         const words = terms.filter(term => verseText.includes(term));
-        const requiredWords = terms.length === 1 ? 1 : Math.max(2, Math.ceil(terms.length * 0.7));
+        const requiredWords = terms.length === 1 ? 1 : Math.max(1, Math.ceil(terms.length * 0.5));
         if (!exact && words.length < requiredWords) return null;
         const creoleVerse = creoleVerseForEnglish(verse);
         return creoleVerse ? { verse: creoleVerse, score: exact ? 8500 : 400 + (words.length * 20), englishMatch: true } : null;
@@ -347,7 +347,7 @@
         const topicTextMatch = activeQuestionTopic && activeQuestionTopic.terms.some(term => verseText.includes(normalize(term)));
         if (!referenceMatch && !exactPhraseMatch && !directTextMatch && !englishTextMatch && !emotionTextMatch && !topicTextMatch) return null;
         const score = referenceMatch ? 10000 : exactPhraseMatch ? 9000 : directTextMatch ? closenessScore(verseText, words) : topicTextMatch ? 500 : emotionTextMatch ? 350 : 200;
-        return { verse: v, score, exactPhraseMatch };
+        return { verse: v, score, exactPhraseMatch, englishMatch: false };
       }).filter(Boolean);
       const seenReferences = new Set(creoleMatches.map(match => `${normalize(match.verse.book_name)}|${match.verse.chapter}|${match.verse.verse}`));
       const englishMatches = englishVerseMatches(raw).filter(match => {
@@ -364,7 +364,19 @@
       const topicNote = activeQuestionTopic ? t('about', { topic: topicName }) : '';
       resultsCount.textContent = matches.length ? `${t('found', { count: matches.length.toLocaleString() })}${topicNote}${languageNote}${emotionNote}${phraseNote}${matches.length > displayLimit ? t('showing', { count: displayLimit }) : ''}` : activeQuestionTopic ? t('noTopic', { topic: topicName }) : t('noResults', { query: raw });
       const highlightTerms = [...new Set([...(english.usedEnglish ? english.highlightTerms : words), ...emotion.highlightTerms, ...(activeQuestionTopic?.terms || [])])];
-      versesDisplay.innerHTML = shown.map(({ verse: v }, i) => `<article class="verse-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6" style="animation-delay:${Math.min(i * 30, 300)}ms"><div class="mb-3 flex items-center gap-3"><span class="h-px w-5 bg-indigo-300"></span><p class="text-xs font-bold uppercase tracking-[.15em] text-indigo-700">${escapeHTML(v.book_name)} ${escapeHTML(v.chapter)}:${escapeHTML(v.verse)}</p></div><p class="font-display text-lg leading-8 text-slate-700 sm:text-xl">${ref ? escapeHTML(v.text) : highlight(v.text, highlightTerms)}</p>${commentaryMarkup(v)}</article>`).join('');
+      
+      versesDisplay.innerHTML = shown.map(({ verse: v, englishMatch }, i) => {
+        const engText = getEnglishVerseText(v);
+        return `<article class="verse-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6" style="animation-delay:${Math.min(i * 30, 300)}ms">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3"><span class="h-px w-5 bg-indigo-300"></span><p class="text-xs font-bold uppercase tracking-[.15em] text-indigo-700">${escapeHTML(v.book_name)} ${escapeHTML(v.chapter)}:${escapeHTML(v.verse)}</p></div>
+            ${englishMatch ? `<span class="rounded bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">English Match</span>` : ''}
+          </div>
+          <p class="font-display text-lg leading-8 text-slate-700 sm:text-xl">${ref ? escapeHTML(v.text) : highlight(v.text, highlightTerms)}</p>
+          ${engText ? `<p class="mt-2 text-sm italic text-slate-500 border-l-2 border-indigo-200 pl-3">KJV: "${escapeHTML(engText)}"</p>` : ''}
+          ${commentaryMarkup(v)}
+        </article>`;
+      }).join('');
     }
     async function loadDefault() {
       try { let response; for (const path of ['hcv.json', '../hcv.json']) { response = await fetch(path); if (response.ok) break; } if (!response?.ok) throw new Error(); initialise(await response.json()); }
@@ -399,13 +411,15 @@
     statusText.textContent = t('loading');
     loadDefault();
   </script>
-// Register Service Worker for PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-        .catch(err => console.log('Service Worker registration failed:', err));
-    });
-  }
+  <!-- Register Service Worker for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
